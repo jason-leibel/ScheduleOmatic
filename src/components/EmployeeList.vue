@@ -20,13 +20,6 @@
       </template>
     </v-data-table>
 
-    <v-file-input
-        v-model="file"
-        accept="*.json"
-        label="File input"
-        on
-    ></v-file-input>
-
     <v-btn
         color="primary"
         class="mr-4"
@@ -53,13 +46,12 @@ export default {
   ],
   data() {
     return {
-      file: null,
       headers: [
         {text: 'Employee Name', align: 'start', value: 'employeeName'},
         {text: 'Desired Work Hours', value: 'employeeHoursToWork'},
         {text: 'Department', value: 'employeeDepartment'},
         {text: 'Hours Available to work', value: 'employeeAvailability.totalHoursAvailable'},
-        { text: 'Actions', value: 'actions', sortable: false }
+        {text: 'Actions', value: 'actions', sortable: false}
       ]
     }
   },
@@ -82,11 +74,18 @@ export default {
       if (this.employeeList.length === 0) {
         this.$emit("notification", "Not Enough People", "error", "No employee`s were found added to the list")
       } else {
-        let lst = this.employeeList.sort((a, b) => {
-          return a.employeeAvailability.totalHoursAvailable - b.employeeAvailability.totalHoursAvailable
-        })
-        debugger
+        this.$emit("generateSchedule", this.shuffleArray(this.employeeList))
       }
+    },
+    shuffleArray(array) {
+      let copy = Array.from(array)
+      for (let i = copy.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+      }
+      return copy
     },
     deleteItem(item) {
       let index = this.employeeList.indexOf(item)
