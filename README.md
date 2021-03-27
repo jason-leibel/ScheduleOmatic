@@ -1,2 +1,2 @@
-# GmailCustomFilterGenerator
-A custom way to create gmail filters for PID's to hopefully speed up the process
+# Schedule-O-Matic
+An easy way to create employee schedules

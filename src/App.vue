@@ -1,63 +1,60 @@
 <template>
   <v-app>
-    <Navigation :is-signed-in="isSignedIn" @signIn="signIn" @signOut="signOut"/>
-    <AddPidFilter :is-signed-in="isSignedIn" :auth-instance="authInstance"/>
+    <Navigation/>
+    <AddEmployee @addEmployee="addEmployee" @notification="sendNotification" />
+    <UploadEmployeeList @updateEmployeeList="updateEmployeeList" />
+    <EmployeeList :employee-list="liveEmployeeList" @notification="sendNotification" />
     <notifications group="app" position="bottom left"/>
-    <Instructions />
   </v-app>
 </template>
 
 <script>
-import Vue from 'vue'
-import AddPidFilter from "./components/AddPidFilter.vue";
 import Navigation from "./components/NavigationBar.vue";
-import Instructions from "./components/Instructions.vue";
+import AddEmployee from "./components/AddEmployee.vue";
+import EmployeeList from "./components/EmployeeList.vue";
+import UploadEmployeeList from "./components/UploadEmployeeList.vue";
 
 import 'vuetify/dist/vuetify.css'
-import VueGapi from 'vue-gapi'
-
-Vue.use(VueGapi, {
-  apiKey: 'AIzaSyA8aWGNiYwZUY8ArkeHy6V98QkqAJ1f2aA',
-  clientId: '243568982452-6tqtb521vek7929r7uj54lh2tt7i2ol8.apps.googleusercontent.com',
-  discoveryDocs: ['https://gmail.googleapis.com/$discovery/rest?version=v1'],
-  scope: "https://mail.google.com/ https://www.googleapis.com/auth/gmail.settings.basic",
-})
 
 export default {
   name: "app",
   components: {
     Navigation,
-    Instructions,
-    AddPidFilter
+    AddEmployee,
+    EmployeeList,
+    UploadEmployeeList
+  },
+  methods: {
+    updateEmployeeList(employees) {
+      this.employeeList = employees
+    },
+    addEmployee(employee) {
+      if (!this.employeeList) {
+        this.employeeList = []
+      }
+      this.employeeList.push(employee)
+    },
+    sendNotification(title, type, text) {
+      console.log("Notification")
+      this.$notify({
+        group: 'app',
+        title,
+        type,
+        duration: 4000,
+        text
+      });
+    }
+  },
+  computed: {
+    liveEmployeeList() {
+      return this.employeeList
+    }
   },
   data() {
     return {
-      auth: null
+      employeeList: []
     }
   },
-  mounted() {
-    this.signIn()
-  },
-  computed: {
-    authInstance() {
-      return this.auth
-    },
-    isSignedIn() {
-      return this.authInstance !== null
-    }
-  },
-  methods: {
-    signIn() {
-      this.$gapi.login().then(data => {
-        this.auth = data
-      })
-    },
-    signOut() {
-      this.$gapi.logout().then(() => {
-        this.auth = null
-      })
-    }
-  }
 };
 </script>
 
