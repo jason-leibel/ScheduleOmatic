@@ -57,6 +57,7 @@ export default {
       headers: [
         {text: 'Employee Name', align: 'start', value: 'employeeName'},
         {text: 'Desired Work Hours', value: 'employeeHoursToWork'},
+        {text: 'Department', value: 'employeeDepartment'},
         {text: 'Hours Available to work', value: 'employeeAvailability.totalHoursAvailable'},
         { text: 'Actions', value: 'actions', sortable: false }
       ]

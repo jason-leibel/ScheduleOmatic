@@ -170,57 +170,57 @@ export default {
       let ranges = {}
       if (!this.notAvailableSunday) {
         ranges['sunday'] = {}
-        ranges['sunday']['startTime'] = this.startTimeSunday
-        ranges['sunday']['endTime'] = this.endTimeSunday
-        time += this.doTimeMath(ranges['sunday'])
+        ranges['sunday']['startTime'] = this.getDoubleFromTime(this.startTimeSunday)
+        ranges['sunday']['endTime'] = this.getDoubleFromTime(this.endTimeSunday)
+        time += this.doTimeMath(this.endTimeSunday, this.startTimeSunday)
       }
 
       if (!this.notAvailableMonday) {
         ranges['monday'] = {}
-        ranges['monday']['startTime'] = this.startTimeMonday
-        ranges['monday']['endTime'] = this.endTimeMonday
-        time += this.doTimeMath(ranges['monday'])
+        ranges['monday']['startTime'] = this.getDoubleFromTime(this.startTimeMonday)
+        ranges['monday']['endTime'] = this.getDoubleFromTime(this.endTimeMonday)
+        time += this.doTimeMath(this.endTimeMonday, this.startTimeMonday)
       }
 
       if (!this.notAvailableTuesday) {
         ranges['tuesday'] = {}
-        ranges['tuesday']['startTime'] = this.startTimeTuesday
-        ranges['tuesday']['endTime'] = this.endTimeTuesday
-        time += this.doTimeMath(ranges['tuesday'])
+        ranges['tuesday']['startTime'] = this.getDoubleFromTime(this.startTimeTuesday)
+        ranges['tuesday']['endTime'] = this.getDoubleFromTime(this.endTimeTuesday)
+        time += this.doTimeMath(this.endTimeTuesday, this.startTimeTuesday)
       }
 
       if (!this.notAvailableWednesday) {
         ranges['wednesday'] = {}
-        ranges['wednesday']['startTime'] = this.startTimeWednesday
-        ranges['wednesday']['endTime'] = this.endTimeWednesday
-        time += this.doTimeMath(ranges['wednesday'])
+        ranges['wednesday']['startTime'] = this.getDoubleFromTime(this.startTimeWednesday)
+        ranges['wednesday']['endTime'] = this.getDoubleFromTime(this.endTimeWednesday)
+        time += this.doTimeMath(this.endTimeWednesday, this.startTimeWednesday)
       }
 
       if (!this.notAvailableThursday) {
         ranges['thursday'] = {}
-        ranges['thursday']['startTime'] = this.startTimeThursday
-        ranges['thursday']['endTime'] = this.endTimeThursday
-        time += this.doTimeMath(ranges['thursday'])
+        ranges['thursday']['startTime'] = this.getDoubleFromTime(this.startTimeThursday)
+        ranges['thursday']['endTime'] = this.getDoubleFromTime(this.endTimeThursday)
+        time += this.doTimeMath(this.endTimeThursday, this.startTimeThursday)
       }
 
       if (!this.notAvailableFriday) {
         ranges['friday'] = {}
-        ranges['friday']['startTime'] = this.startTimeFriday
-        ranges['friday']['endTime'] = this.endTimeFriday
-        time += this.doTimeMath(ranges['friday'])
+        ranges['friday']['startTime'] = this.getDoubleFromTime(this.startTimeFriday)
+        ranges['friday']['endTime'] = this.getDoubleFromTime(this.endTimeFriday)
+        time += this.doTimeMath(this.endTimeFriday, this.startTimeFriday)
       }
 
       if (!this.notAvailableSaturday) {
         ranges['saturday'] = {}
-        ranges['saturday']['startTime'] = this.startTimeSaturday
-        ranges['saturday']['endTime'] = this.endTimeSaturday
-        time += this.doTimeMath(ranges['saturday'])
+        ranges['saturday']['startTime'] = this.getDoubleFromTime(this.startTimeSaturday)
+        ranges['saturday']['endTime'] = this.getDoubleFromTime(this.endTimeSaturday)
+        time += this.doTimeMath(this.endTimeSaturday, this.startTimeSaturday)
       }
       ranges["totalHoursAvailable"] = time
       return ranges
     },
-    doTimeMath(obj) {
-      return (this.getDoubleFromTime(obj.endTime) - this.getDoubleFromTime(obj.startTime))
+    doTimeMath(endTime, startTime) {
+      return (this.getDoubleFromTime(endTime) - this.getDoubleFromTime(startTime))
     },
     getDoubleFromTime(str) {
       let dbl = 0.0

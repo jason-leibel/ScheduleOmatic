@@ -29,6 +29,12 @@
                 required
             ></v-text-field>
 
+            <v-select
+                v-model="employeeDepartment"
+                :items="departments"
+                label="Employee Department"
+            ></v-select>
+
             <EmployeeAvailability :key="componentKey" ref="employeeAvailability"/>
 
             <v-btn
@@ -66,7 +72,15 @@ export default {
     return {
       employeeName: "",
       hoursToWorkWeek: "",
-      componentKey: 0
+      employeeDepartment: "",
+      componentKey: 0,
+      departments: [
+          "Post Office",
+          "Automotive Parts",
+          "Seasonal",
+          "Cashier",
+          "Customer Service"
+      ]
     }
   },
   methods: {
@@ -75,6 +89,7 @@ export default {
       employee["employeeName"] = this.employeeName
       employee["employeeAvailability"] = this.$refs.employeeAvailability[0].getAvailability()
       employee["employeeHoursToWork"] = this.hoursToWorkWeek
+      employee["employeeDepartment"] = this.employeeDepartment
       debugger
       if (employee["employeeAvailability"]["totalHoursAvailable"] < this.hoursToWorkWeek) {
         this.$emit("notification", "Warning", "warning", "Employee availability is less then desired hours per week.")
@@ -88,6 +103,7 @@ export default {
       // Empty fields.
       this.employeeName = ""
       this.hoursToWorkWeek = ""
+      this.employeeDepartment = ""
       this.componentKey += 1
     }
   }
