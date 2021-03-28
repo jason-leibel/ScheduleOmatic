@@ -17,7 +17,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   .NavigationBar__title {
     font-family: "Roboto", sans-serif;
     font-size: 32px;
