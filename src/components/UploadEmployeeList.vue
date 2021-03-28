@@ -1,17 +1,11 @@
 <template>
-  <v-card
-      class="mx-auto"
-      tile
-      style="width: 80%; padding: 20px; margin: 20px auto;"
-  >
-    <v-expansion-panels accordion>
-      <v-expansion-panel
-          v-for="(item,i) in 1"
-          :key="i"
-      >
-        <v-expansion-panel-header>Upload Employee List</v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <h1>Upload Employee List:</h1>
+  <v-expansion-panels style="width: 80%; margin: 10px auto" accordion>
+    <v-expansion-panel
+        v-for="(item,i) in 1"
+        :key="i"
+    >
+      <v-expansion-panel-header><h1>Upload Employee List File</h1></v-expansion-panel-header>
+      <v-expansion-panel-content>
 
           <v-file-input
               v-model="file"
@@ -23,6 +17,7 @@
           <v-btn
               color="primary"
               class="mr-4"
+              :disabled="file === null"
               @click="uploadFile"
           >
             Upload to List
@@ -30,7 +25,6 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-  </v-card>
 </template>
 
 <script>

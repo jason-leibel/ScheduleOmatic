@@ -1,10 +1,11 @@
 <template>
-  <v-card
-      class="mx-auto"
-      tile
-      style="width: 80%; padding: 20px; margin: 20px auto;"
-  >
-    <h1>Employee List:</h1>
+  <v-expansion-panels style="width: 80%; margin: 10px auto" accordion>
+    <v-expansion-panel
+        v-for="(item,i) in 1"
+        :key="i"
+    >
+      <v-expansion-panel-header><h1>Employee List</h1></v-expansion-panel-header>
+      <v-expansion-panel-content>
     <v-data-table
         :headers="headers"
         :items="liveEmployeeList"
@@ -35,7 +36,9 @@
     >
       Generate Schedule
     </v-btn>
-  </v-card>
+    </v-expansion-panel-content>
+    </v-expansion-panel>
+    </v-expansion-panels>
 </template>
 
 <script>

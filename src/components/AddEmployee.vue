@@ -1,17 +1,11 @@
 <template>
-  <v-card
-      class="mx-auto"
-      tile
-      style="width: 80%; padding: 20px; margin-left: auto; margin-right: auto; margin-top: 20px"
-  >
-    <v-expansion-panels accordion>
+    <v-expansion-panels v-model="panel" multiple style="width: 80%; margin: 10px auto" accordion>
       <v-expansion-panel
           v-for="(item,i) in 1"
           :key="i"
       >
-        <v-expansion-panel-header>Add Employee</v-expansion-panel-header>
+        <v-expansion-panel-header><h1>Add Employee</h1></v-expansion-panel-header>
         <v-expansion-panel-content>
-          <h1>Employee Info:</h1>
           <v-form
               ref="form"
           >
@@ -57,7 +51,6 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-  </v-card>
 </template>
 
 <script>
@@ -74,6 +67,7 @@ export default {
       hoursToWorkWeek: "",
       employeeDepartment: "",
       componentKey: 0,
+      panel: [0],
       departments: [
           "Post Office",
           "Automotive Parts",

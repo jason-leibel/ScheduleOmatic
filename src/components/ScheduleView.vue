@@ -1,43 +1,47 @@
 <template>
-  <v-card
-      class="mx-auto"
-      tile
-      style="width: 95%; padding: 10px; margin: 20px auto;"
-  >
-    <v-data-table
-        :headers="scheduleHeaders"
-        :items="scheduleObj"
-        dense
-        group-by="department"
-        :items-per-page="10">
-      <template v-slot:group.header="{items, isOpen, toggle}">
-        <th colspan="9" @click="toggle">
-          <v-icon
-          >{{ isOpen ? 'mdi-minus' : 'mdi-plus' }}
-          </v-icon>
-          {{ items[0].department }}
-        </th>
-      </template>
-      <template v-slot:item="{ item }">
-        <tr>
-          <td v-for="(header,key) in scheduleHeaders" :key="key">
-            <v-edit-dialog
-                :return-value.sync="item[header.value]"
-                large
-            > {{ item[header.value] }}
-              <template v-slot:input>
-                <v-text-field
-                    v-model="item[header.value]"
-                    label="Edit"
-                    single-line
-                ></v-text-field>
-              </template>
-            </v-edit-dialog>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-  </v-card>
+  <v-expansion-panels style="width: 80%; margin: 10px auto" accordion>
+    <v-expansion-panel
+        v-for="(item,i) in 1"
+        :key="i"
+    >
+      <v-expansion-panel-header><h1>Schedule View</h1></v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-data-table
+            :headers="scheduleHeaders"
+            :items="scheduleObj"
+            dense
+            group-by="department"
+            :items-per-page="10">
+          <template v-slot:group.header="{items, isOpen, toggle}">
+            <th colspan="9" @click="toggle">
+              <v-icon
+              >{{ isOpen ? 'mdi-minus' : 'mdi-plus' }}
+              </v-icon>
+              {{ items[0].department }}
+            </th>
+          </template>
+          <template v-slot:item="{ item }">
+            <tr>
+              <td v-for="(header,key) in scheduleHeaders" :key="key">
+                <v-edit-dialog
+                    :return-value.sync="item[header.value]"
+                    large
+                > {{ item[header.value] }}
+                  <template v-slot:input>
+                    <v-text-field
+                        v-model="item[header.value]"
+                        label="Edit"
+                        single-line
+                    ></v-text-field>
+                  </template>
+                </v-edit-dialog>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script>
