@@ -70,7 +70,7 @@ export default {
       panel: [0],
       departments: [
           "Post Office",
-          "Automotive Parts",
+          "Cashier",
           "Customer Service"
       ]
     }

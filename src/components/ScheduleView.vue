@@ -39,12 +39,22 @@
             </tr>
           </template>
         </v-data-table>
+        <v-btn
+            color="primary"
+            class="mr-4"
+            style="height: 25px"
+            @click="saveToExcel"
+        >
+          Download Excel
+        </v-btn>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
 <script>
+import { json2excel } from 'js2excel';
+
 export default {
   name: "ScheduleView",
   props: [
@@ -53,7 +63,6 @@ export default {
   methods: {
     generateSchedule(list) {
       this.scheduleObj = []
-
       this.timeObj.departments.forEach(dep => {
         let scheduleObj = {}
 
@@ -62,16 +71,17 @@ export default {
         depart.timeFrames.forEach(tf => {
           scheduleObj[tf.day] = {}
           workers.forEach(wrk => {
+            scheduleObj[tf.day][wrk.employeeName] = {}
+
             if (wrk.employeeAvailability[tf.day] !== undefined) {
-              scheduleObj[tf.day][wrk.employeeName] = {}
               scheduleObj[tf.day][wrk.employeeName].available = true
-              let empStartTime = wrk.employeeAvailability[tf.day].startTime
-              let empEndTime = wrk.employeeAvailability[tf.day].endTime
+              let employeeStartTime = wrk.employeeAvailability[tf.day].startTime
+              let employeeEndTime = wrk.employeeAvailability[tf.day].endTime
               // If the employee is available before or at shift open
               if (wrk.employeeAvailability[tf.day].startTime <= tf.open) {
                 // schedule employee to work from open eiter until 8 hours or they become unavailable
                 scheduleObj[tf.day][wrk.employeeName].startTime = tf.open
-                let hoursAvail = empEndTime - empStartTime
+                let hoursAvail = employeeEndTime - employeeStartTime
                 scheduleObj[tf.day][wrk.employeeName].endTime = (
                     hoursAvail < 8
                 ) ? tf.open + hoursAvail : ((tf.open + 8) > tf.close) ? tf.close : tf.open + 8
@@ -79,13 +89,12 @@ export default {
               } else {
                 // schedule employee to work from their time available either until close or 8 hours later
                 scheduleObj[tf.day][wrk.employeeName].startTime = wrk.employeeAvailability[tf.day].startTime
-                let hoursAvail = empEndTime - empStartTime
-                scheduleObj[tf.day][wrk.employeeName].endTime = ((hoursAvail + empStartTime) > tf.close) ? tf.close :
-                    (hoursAvail + empStartTime)
+                let hoursAvail = employeeEndTime - employeeStartTime
+                scheduleObj[tf.day][wrk.employeeName].endTime = ((hoursAvail + employeeStartTime) > tf.close) ? tf.close :
+                    (hoursAvail + employeeStartTime)
               }
             } else {
               // Employee unavailable that day
-              scheduleObj[tf.day][wrk.employeeName] = {}
               scheduleObj[tf.day][wrk.employeeName].available = false
             }
           })
@@ -120,7 +129,7 @@ export default {
         this.scheduleObj.push(res)
       })
     },
-    filterOutPeople(obj, department) {
+    filterOutPeople(obj, departmentName) {
       let timeWorked = {}
       let middleDayOptions = {}
       for (let day in obj) {
@@ -129,40 +138,37 @@ export default {
             middleDayOptions[day] = []
           }
           // { friday: Test User: {available: true, startTime: 10.5, endTime: 18.5, name: "Test User"}
-          let employees = this.shuffleArray(this.jsonObjectsToArray(obj[day]))
-          let depConst = this.timeObj.departments.filter(i => i.name === department)[0]
-          let timeConst = depConst.timeFrames.filter(i => i.day === day)[0]
+          let employeeList = this.shuffleArray(this.jsonObjectsToArray(obj[day]))
+          let department = this.timeObj.departments.filter(i => i.name === departmentName)[0]
+          let timeframe = department.timeFrames.filter(i => i.day === day)[0]
 
-          if (employees.length > depConst.requiredEmployeeAtGivenTime) {
-            let hasStartingEmployee = false
-            let hasClosingEmployee = false
-            let startingEmployee = null
-            let closingEmployee = null
+          if (employeeList.length > department.requiredEmployeeAtGivenTime) {
+            let hasStartingEmployee, hasClosingEmployee, startingEmployee, closingEmployee
             let keepLooping = true
             while (keepLooping) {
-              for (let i = 0; i < employees.length; i++) {
-                let employee = employees[i]
+              for (let i = 0; i < employeeList.length; i++) {
+                let employee = employeeList[i]
                 if (employee.available) {
-                  if (employee.startTime === timeConst.open) {
+                  if (employee.startTime === timeframe.open) {
                     if (hasStartingEmployee) {
-                      if (timeWorked[startingEmployee.name] >= this.employeeList.filter(e => e.employeeName === startingEmployee.name)[0].employeeHoursToWork) {
+                      if (timeWorked[startingEmployee.name] >= 20) {
                         middleDayOptions[day].push(startingEmployee)
-                        employees.splice(employees.indexOf(startingEmployee), 1)
+                        employeeList.splice(employeeList.indexOf(startingEmployee), 1)
                         startingEmployee = employee
                       } else {
-                        employees.splice(i, 1)
+                        employeeList.splice(i, 1)
                       }
                     }
                     startingEmployee = employee
                     hasStartingEmployee = true
-                  } else if (employee.endTime === timeConst.close) {
+                  } else if (employee.endTime === timeframe.close) {
                     if (hasClosingEmployee) {
-                      if (timeWorked[closingEmployee.name] >= this.employeeList.filter(e => e.employeeName === closingEmployee.name)[0].employeeHoursToWork) {
+                      if (timeWorked[closingEmployee.name] >= 20) {
                         middleDayOptions[day].push(closingEmployee)
-                        employees.splice(employees.indexOf(closingEmployee), 1)
+                        employeeList.splice(employeeList.indexOf(closingEmployee), 1)
                         closingEmployee = employee
                       } else {
-                        employees.splice(i, 1)
+                        employeeList.splice(i, 1)
                       }
                     }
                     closingEmployee = employee
@@ -170,12 +176,12 @@ export default {
                   } else {
                     // Employee can work, not start or close tho
                     middleDayOptions[day].push(employee)
-                    employees.splice(i, 1)
+                    employeeList.splice(i, 1)
                   }
                 }
-                if (employees.filter(e => e.available).length <= depConst.requiredEmployeeAtGivenTime) {
+                if (employeeList.filter(e => e.available).length <= department.requiredEmployeeAtGivenTime) {
                   keepLooping = false
-                  employees.forEach(employ => {
+                  employeeList.forEach(employ => {
                     if (timeWorked[employ.name] === undefined) {
                       timeWorked[employ.name] = 0
                     }
@@ -185,14 +191,14 @@ export default {
                 }
               }
             }
-          } else if (employees.length < depConst.requiredEmployeeAtGivenTime) {
-            this.sendNotification("Warning", "warning", `Not enough employees available on ${day} in ${department}`)
+          } else if (employeeList.length < department.requiredEmployeeAtGivenTime) {
+            this.sendNotification("Warning", "warning", `Not enough employees available on ${day} in ${departmentName}`)
           }
 
-          obj[day] = this.arrayToJsonObjects(employees, day)
+          obj[day] = this.arrayToJsonObjects(employeeList, day)
         }
       }
-      console.log(middleDayOptions)
+      this.looseShifts[departmentName] = middleDayOptions
       return obj
     },
     arrayToJsonObjects(arr, day) {
@@ -243,10 +249,22 @@ export default {
         default:
           return "00"
       }
+    },
+    saveToExcel() {
+      try {
+        json2excel({
+          data: this.scheduleObj,
+          name: `Schedule`,
+          formateDate: 'yyyy/mm/dd'
+        });
+      } catch (e) {
+        console.error('export error');
+      }
     }
   },
   data() {
     return {
+      looseShifts: {},
       scheduleObj: [],
       scheduleHeaders: [
         {text: 'Employee Name', align: 'start', value: 'name'},
@@ -274,7 +292,7 @@ export default {
             ]
           },
           {
-            name: "Automotive Parts", requiredEmployeeAtGivenTime: 2, totalHoursAvailable: 83.5,
+            name: "Cashier", requiredEmployeeAtGivenTime: 2, totalHoursAvailable: 83.5,
             timeFrames: [
               {day: "sunday", open: 10.5, close: 21},
               {day: "monday", open: 10.5, close: 21},
