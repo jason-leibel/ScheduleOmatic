@@ -77,8 +77,6 @@ export default {
       departments: [
           "Post Office",
           "Automotive Parts",
-          "Seasonal",
-          "Cashier",
           "Customer Service"
       ]
     }
